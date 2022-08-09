@@ -126,7 +126,3 @@ class PostsURLTest(TestCase):
             with self.subTest(url=url):
                 response = self.client.get(url, follow=True)
                 self.assertRedirects(response, redirect)
-
-    def test_page_404(self):
-        response = self.guest_client.get('/Horizonerersrsa/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
