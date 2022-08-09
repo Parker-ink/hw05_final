@@ -10,6 +10,7 @@ from faker import Faker
 from django.core.cache import cache
 
 from posts.models import Group, Post, Comment
+from ..forms import PostForm
 
 User = get_user_model()
 fake = Faker()
@@ -33,6 +34,7 @@ class PostCreateFromTests(TestCase):
             author=cls.test_user,
             group=cls.group,
         )
+        cls.form = PostForm()
 
     @classmethod
     def tearDownClass(cls):
@@ -47,9 +49,23 @@ class PostCreateFromTests(TestCase):
     def test_post(self):
         """Тест создания поста"""
         post_count = Post.objects.count()
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
         form_data = {
             'text': fake.text(),
             'group': self.group.id,
+            'image': uploaded,
         }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
@@ -60,6 +76,12 @@ class PostCreateFromTests(TestCase):
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': new_post.author}))
         self.assertEqual(Post.objects.count(), post_count + 1)
+        self.assertTrue(
+            Post.objects.filter(
+                text=new_post.text,
+                image=new_post.image
+            ).exists
+        )
         self.assertEqual(form_data['text'], new_post.text)
         self.assertEqual(self.test_user, new_post.author)
         self.assertEqual(self.group, new_post.group)
@@ -93,35 +115,6 @@ class PostCreateFromTests(TestCase):
                 author=self.test_user
             ).exists()
         )
-
-
-def test_post_with_picture(self):
-    small_gif = (
-        b'\x47\x49\x46\x38\x39\x61\x02\x00'
-        b'\x01\x00\x80\x00\x00\x00\x00\x00'
-        b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-        b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-        b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-        b'\x0A\x00\x3B'
-    )
-    uploaded = SimpleUploadedFile(
-        name='small.gif',
-        content=small_gif,
-        content_type='image/gif'
-    )
-    form_data = {
-        'text': 'Пост с картинкой',
-        'group': self.group.id,
-        'image': uploaded
-    }
-    response = self.authorized_client.post(
-        reverse('new_post'),
-        data=form_data,
-        follow=True,
-    )
-    post = Post.objects.get(id=self.group.id)
-    self.assertRedirects(response, reverse('index'))
-    self.assertEqual(post.text, 'Пост с картинкой')
 
 
 class CommentsTests(TestCase):
