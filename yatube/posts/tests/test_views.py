@@ -102,6 +102,10 @@ class PostPagesTests(TestCase):
                                                          self.user.username}))
         test_post = response.context['page_obj'][0]
         post_image = Post.objects.first().image
+        response_post = self.client.get(
+            reverse('posts:post_detail', kwargs={'post_id': self.post.id})
+        )
+        self.assertIn('comments', response_post.context)
         self.assertEqual(post_image, 'posts/small.gif')
         self.assertEqual(test_post, self.post)
         self.assertEqual(test_post.author, self.post.author)
@@ -190,7 +194,6 @@ class CacheTests(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text=fake.text(),
-            id=1,
         )
 
     def setUp(self):

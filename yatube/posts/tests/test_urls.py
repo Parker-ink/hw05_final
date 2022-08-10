@@ -37,22 +37,19 @@ class PostsURLTest(TestCase):
 
     def test_urls_status_guest(self):
         """Проверека статуса гостя"""
-        templates_check_status = {
-            reverse('posts:index'): HTTPStatus.OK,
+        templates_status_chek = (
+            reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug':
-                                                self.group.slug}):
-                                                    HTTPStatus.OK,
+                                                self.group.slug}),
             reverse('posts:profile', kwargs={'username':
-                                             self.user.username}):
-                                                 HTTPStatus.OK,
+                                             self.user.username}),
             reverse('posts:post_detail', kwargs={'post_id':
-                                                 self.post.id}):
-                                                    HTTPStatus.OK,
-        }
-        for url, status in templates_check_status.items():
+                                                 self.post.id}),
+        )
+        for url in templates_status_chek:
             with self.subTest(url=url):
-                response = self.guest_client.get(url)
-                self.assertEqual(response.status_code, status)
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_create_available_authorized_user(self):
         """Авторизованному пользователю доступно создание поста /create/"""

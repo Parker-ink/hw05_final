@@ -137,7 +137,7 @@ class CommentsTests(TestCase):
         cache.clear()
 
     def test_add_comments(self):
-        """Тест добавления Comments если форма Валидная"""
+        """Тест добавления комментария"""
         comments_count = Comment.objects.count()
         form_data = {
             'text': fake.text(),
@@ -147,13 +147,12 @@ class CommentsTests(TestCase):
             data=form_data,
             follow=True
         )
-        response_post = self.client.get(
-            reverse('posts:post_detail', kwargs={'post_id': self.post.id})
-        )
-        self.assertIn('comments', response_post.context)
+        comment = Comment.objects.latest('created')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertTrue(
             Comment.objects.filter(text=form_data['text']).exists())
         self.assertRedirects(response, reverse(
             'posts:post_detail',
             kwargs={'post_id': self.post.id}))
+        self.assertEqual(form_data['text'], comment.text)
+        self.assertEqual(self.user, comment.author)
