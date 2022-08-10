@@ -197,20 +197,18 @@ class CacheTests(TestCase):
         )
 
     def setUp(self):
-        self.authorized_client = Client()
-        self.guest_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.client
 
     def test_cache(self):
         """Тест кэширования главной страницы"""
-        first_request = self.authorized_client.get(reverse('posts:index'))
+        first_request = self.client.get(reverse('posts:index'))
         post_1 = Post.objects.get(pk=1)
         post_1.text = 'Мы изменили текст, без обид'
         post_1.save()
-        second_request = self.authorized_client.get(reverse('posts:index'))
+        second_request = self.client.get(reverse('posts:index'))
         self.assertEqual(first_request.content, second_request.content)
         cache.clear()
-        third_request = self.authorized_client.get(reverse('posts:index'))
+        third_request = self.client.get(reverse('posts:index'))
         self.assertNotEqual(first_request.content, third_request.content)
 
 
