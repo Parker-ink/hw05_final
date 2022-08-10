@@ -195,7 +195,6 @@ class CacheTests(TestCase):
 
     def setUp(self):
         self.authorized_client = Client()
-        self.user = User.objects.create_user(username='Witcher3')
         self.guest_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -216,16 +215,16 @@ class FollowTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.user = User.objects.create_user(username='user')
-
-    def setUp(self):
-        self.client_auth_follower = Client()
-        self.client_auth_following = Client()
-        self.user_follower = User.objects.create_user(
+        cls.user = User.objects.create_user(
             username='Geralt',
             email='Novigrad@mail.ru',
             password='Stryga',
         )
+
+    def setUp(self):
+        self.client_auth_follower = Client()
+        self.client_auth_following = Client()
+        self.user_follower = self.user
         self.user_following = User.objects.create_user(
             username='following',
             email='following@mail.ru',

@@ -34,9 +34,10 @@ class Post (models.Model):
                               help_text='Выберите группу')
 
     image = models.ImageField(
-        'Картинка',
         upload_to='posts/',
-        blank=True
+        blank=True,
+        verbose_name='Картинка',
+        help_text='Загрузите картинку'
     )
 
     def __str__(self) -> str:

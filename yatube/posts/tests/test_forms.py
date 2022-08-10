@@ -72,7 +72,7 @@ class PostCreateFromTests(TestCase):
             data=form_data,
             follow=True
         )
-        new_post = Post.objects.first()
+        new_post = Post.objects.latest('pub_date')
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': new_post.author}))
         self.assertEqual(Post.objects.count(), post_count + 1)
@@ -108,13 +108,8 @@ class PostCreateFromTests(TestCase):
             kwargs={'post_id': post.id})
         self.assertRedirects(response, redirect)
         self.assertEqual(Post.objects.count(), posts_count)
-        self.assertTrue(
-            Post.objects.filter(
-                text=form_data['text'],
-                group=self.group.id,
-                author=self.test_user
-            ).exists()
-        )
+        post.refresh_from_db()
+        self.assertEqual(post.text, form_data['text'])
 
 
 class CommentsTests(TestCase):
@@ -140,13 +135,6 @@ class CommentsTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(CommentsTests.user)
         cache.clear()
-
-    def test_pages_comment_available_authorized_client(self):
-        """Авторизированному пользователю доступна страница /comment/."""
-        response = self.authorized_client.get(reverse('posts:add_comment',
-                                                      args=[self.post.id]))
-        self.assertRedirects(response, reverse('posts:post_detail',
-                                               args=[self.post.id]))
 
     def test_add_comments(self):
         """Тест добавления Comments если форма Валидная"""

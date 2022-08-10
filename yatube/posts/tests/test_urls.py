@@ -1,5 +1,6 @@
-from django.core.cache import cache
 from http import HTTPStatus
+
+from django.core.cache import cache
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -124,5 +125,5 @@ class PostsURLTest(TestCase):
         }
         for url, redirect in url_redirect.items():
             with self.subTest(url=url):
-                response = self.client.get(url, follow=True)
+                response = self.guest_client.get(url, follow=True)
                 self.assertRedirects(response, redirect)
