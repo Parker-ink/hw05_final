@@ -196,9 +196,6 @@ class CacheTests(TestCase):
             text=fake.text(),
         )
 
-    def setUp(self):
-        self.client
-
     def test_cache(self):
         """Тест кэширования главной страницы"""
         first_request = self.client.get(reverse('posts:index'))
@@ -221,20 +218,21 @@ class FollowTests(TestCase):
             email='Novigrad@mail.ru',
             password='Stryga',
         )
+        cls.user2 = User.objects.create_user(
+            username='following',
+            email='following@mail.ru',
+            password='test'
+        )
+        cls.post = Post.objects.create(
+            author=cls.user2,
+            text=fake.text()
+        )
 
     def setUp(self):
         self.client_auth_follower = Client()
         self.client_auth_following = Client()
         self.user_follower = self.user
-        self.user_following = User.objects.create_user(
-            username='following',
-            email='following@mail.ru',
-            password='test'
-        )
-        self.post = Post.objects.create(
-            author=self.user_following,
-            text=fake.text()
-        )
+        self.user_following = self.user2
         self.client_auth_follower.force_login(self.user_follower)
         self.client_auth_following.force_login(self.user_following)
         self.user_no_author = Client()
@@ -289,7 +287,7 @@ class FollowTests(TestCase):
         self.assertEqual(post_text, self.post.text)
 
     def test_not_follow_user_user(self):
-        """Пользователь не может пописаться сам на себя."""
+        """Пользователь не может подписаться сам на себя."""
         self.authorized_client.get(reverse(
             'posts:profile_follow',
             kwargs={'username': self.user.username}))

@@ -32,7 +32,7 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    user_posts = author.posts.select_related('author')
+    user_posts = author.posts.select_related('group')
     page_obj = get_paginator_obj(request, user_posts)
     following = request.user.is_authenticated and (
         Follow.objects.filter(
@@ -124,7 +124,7 @@ def profile_follow(request, username):
     user = request.user
     author = User.objects.get(username=username)
     is_follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not is_follower.exists():
+    if user != author and not is_follower:
         Follow.objects.get_or_create(user=user, author=author)
     return redirect(reverse('posts:profile', args=[username]))
 
