@@ -26,6 +26,8 @@ SECRET_KEY = '_jo-(slpy7rk$wig*6n)ee9%q#kmybj=@-(s*8&2gj(ja%$4bn'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'www.Parkerink.pythonanywhere.com',
+    'Parkerink.pythonanywhere.com',
     'localhost',
     '127.0.0.1',
     '[::1]',
