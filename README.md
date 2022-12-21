@@ -14,5 +14,19 @@ source venv/bin/activate
 ```
 4. Install required packages from requirements.txt file:
 ```bash
+python3 -m pip install --upgrade pip
+
 pip install -r requirements.txt
+```
+5. Make migrations:
+```bash
+python3 manage.py migrate
+```
+6. Create Super User
+```bash
+python3 manage.py createsuperuser
+```
+7. Start the project
+```bash
+python3 manage.py runserver
 ```
